@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guía de Pagos - Moto</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: url('https://fondosmil.co/fondo/4095.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+    }
+    .encabezado {
+      background: #0dcaf0;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      color: #fff;
+    }
+    .card {
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .btn-custom {
+      border-radius: 50px;
+      padding: 10px 20px;
+      font-weight: bold;
+    }
+    .progress {
+      height: 25px;
+      border-radius: 50px;
+    }
+    .table thead {
+      background: #0d6efd;
+      color: #fff;
+    }
+    #mensajeDia {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .modal-content {
+      border-radius: 15px;
+      text-align: center;
+    }
+    .moto-img {
+      width: 150px;
+      display: block;
+      margin: 0 auto 10px auto;
+    }
+    .logo-moto {
+      width: 100px;
+      margin-right: 10px;
+    }
+    h2, h5 {
+      font-weight: bold;
+    }
+    td, th {
+      vertical-align: middle;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container py-4">
+  <!-- Encabezado -->
+  <div class="d-flex justify-content-between align-items-center mb-4 encabezado">
+    <div class="d-flex align-items-center">
+      <img src="https://motosistemahonda.com.pe/images/motos/crf250r-rojo.webp" 
+           alt="Logo Moto" class="logo-moto">
+      <h2 class="m-0"> PAGOS DIARIOS - CRF CROSS</h2>
+    </div>
+    <button class="btn btn-light btn-sm" onclick="abrirModalClave()">🔑 Cambiar Vista</button>
+  </div>
+
+  <!-- Información del cliente y vendedor -->
+  <div class="row mb-4 text-center">
+    <div class="col-md-3 mb-3">
+      <div class="card p-3">
+        <h5>COMPRADOR</h5>
+        <p id="COMPRADORNombre">ALEXANDER CIENFUEGO MONTALBAN</p>
+        <h6>DNI</h6>
+        <p>40306984</p>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card p-3">
+        <h5>VENDEDOR</h5>
+        <p id="VENDEDORNombre">SANDOVAL MEDINA GIANCARLO</p>
+        <h6>DNI</h6>
+        <p>75480420</p>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card p-3">
+        <h5>DEUDA TOTAL</h5>
+        <p><span id="deudaTotal">S/ 4,500.00</span></p>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card p-3">
+        <h5>SALDO PENDIENTE</h5>
+        <p><span id="saldoPendiente">S/ 4,500.00</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Imagen moto -->
+  <div class="text-center mb-4">
+    <img src="https://motosistemahonda.com.pe/images/motos/crf250r-rojo.webp" class="moto-img" alt="Moto Honda CRF250R">
+    <p class="text-light fw-bold">Moto asociada al crédito</p>
+  </div>
+
+  <!-- Barra de progreso (solo admin) -->
+  <div id="estadoPagoCard" class="card p-3 mb-4" style="display:none;">
+    <h5>ESTADO DE PAGO</h5>
+    <p id="mensajeDia" class="text-primary"></p>
+    <div class="progress mb-2">
+      <div id="barraProgreso" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%">0%</div>
+    </div>
+    <p id="detalleMonto" class="fw-bold text-dark"></p>
+  </div>
+
+  <!-- Sección Admin -->
+  <div id="seccionAdmin" style="display:none;">
+    <button class="btn btn-success btn-custom mb-3" onclick="registrarPago()">💰 Registrar Pago Diario</button>
+
+    <!-- Pago manual -->
+    <div class="card p-3 mb-4">
+      <h5>Registrar Pago Manual</h5>
+      <div class="row g-2">
+        <div class="col-md-5">
+          <input type="date" id="fechaPago" class="form-control">
+        </div>
+        <div class="col-md-5">
+          <input type="number" id="montoPago" class="form-control" value="20">
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-warning w-100" onclick="registrarPagoManual()">➕ Agregar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historial -->
+  <div class="card p-3">
+    <h5>HISTORIAL DE PAGOS</h5>
+    <div class="table-responsive">
+      <table class="table table-bordered mt-3">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Fecha</th>
+            <th>Monto</th>
+            <th>Acumulado</th>
+            <th id="accionesHeader" style="display:none;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaPagos"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Alerta -->
+<div class="modal fade" id="alertaModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title">⚠️ Alerta</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="alertaMensaje"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Clave Admin -->
+<div class="modal fade" id="claveModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">🔑 Acceso Administrador</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Ingrese su clave de administrador para continuar</p>
+        <input type="password" id="claveInput" class="form-control text-center" placeholder="••••••" />
+      </div>
+      <div class="modal-footer d-flex justify-content-center">
+        <button class="btn btn-success" onclick="verificarClave()">Acceder</button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const deudaTotal = 4500;
+  const cuotaDiaria = 20;
+  const adminPassword = "17112024";
+
+  let pagos = JSON.parse(localStorage.getItem("pagosMoto")) || [];
+  let modoAdmin = false;
+
+  function formatoMoneda(valor) {
+    return new Intl.NumberFormat("es-PE", { style: "currency", currency: "PEN" }).format(valor);
+  }
+
+  function formatearFecha(input) {
+    let d;
+    if (input instanceof Date) {
+      d = input;
+    } else if (typeof input === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(input)) {
+      const [y, m, day] = input.split('-').map(Number);
+      d = new Date(y, m - 1, day);
+    } else {
+      d = new Date(input);
+    }
+    const dias = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+    return `${dias[d.getDay()]}, ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+  }
+
+  function mostrarAlerta(msg) {
+    document.getElementById("alertaMensaje").innerText = msg;
+    new bootstrap.Modal(document.getElementById("alertaModal")).show();
+  }
+
+  function actualizarVista() {
+    let totalPagado = pagos.reduce((acc, p) => acc + p.monto, 0);
+    let saldoPend = deudaTotal - totalPagado;
+    if (saldoPend < 0) saldoPend = 0;
+    let progreso = Math.min((totalPagado / deudaTotal) * 100, 100);
+
+    document.getElementById("saldoPendiente").innerText = formatoMoneda(saldoPend);
+    document.getElementById("deudaTotal").innerText = formatoMoneda(deudaTotal);
+    document.getElementById("barraProgreso").style.width = progreso + "%";
+    document.getElementById("barraProgreso").innerText = progreso.toFixed(1) + "%";
+
+    document.getElementById("detalleMonto").innerText = 
+      `${formatoMoneda(totalPagado)} de ${formatoMoneda(deudaTotal)} (${progreso.toFixed(1)}%)`;
+
+    let hoy = new Date();
+    let fechaForm = formatearFecha(hoy);
+    if (saldoPend <= 0) {
+      document.getElementById("mensajeDia").innerText = "🎉 Deuda cancelada, no se requieren más pagos";
+      document.getElementById("mensajeDia").classList.replace("text-primary","text-success");
+    } else if (pagos.some(p => p.fecha.includes(fechaForm))) {
+      document.getElementById("mensajeDia").innerText = "✅ Pago de hoy ya registrado";
+      document.getElementById("mensajeDia").classList.replace("text-primary","text-success");
+    } else if (hoy.getDay() === 0) {
+      document.getElementById("mensajeDia").innerText = "🚫 Hoy es Domingo, no se registran pagos";
+      document.getElementById("mensajeDia").classList.replace("text-success","text-danger");
+    } else {
+      document.getElementById("mensajeDia").innerText = "📅 Aún no se registró el pago de hoy";
+      document.getElementById("mensajeDia").classList.replace("text-success","text-primary");
+    }
+
+    let tabla = document.getElementById("tablaPagos");
+    tabla.innerHTML = "";
+    let acumulado = 0;
+    pagos.forEach((pago, i) => {
+      acumulado += pago.monto;
+      tabla.innerHTML += `
+        <tr>
+          <td>${i+1}</td>
+          <td>${pago.fecha}</td>
+          <td>${formatoMoneda(pago.monto)}</td>
+          <td>${formatoMoneda(acumulado)}</td>
+          ${modoAdmin ? `
+          <td>
+            <button class="btn btn-sm btn-info" onclick="editarPago(${i})">✏️</button>
+            <button class="btn btn-sm btn-danger" onclick="eliminarPago(${i})">🗑️</button>
+          </td>` : ""}
+        </tr>`;
+    });
+
+    document.getElementById("accionesHeader").style.display = modoAdmin ? "table-cell" : "none";
+    localStorage.setItem("pagosMoto", JSON.stringify(pagos));
+  }
+
+  function registrarPago() {
+    let hoy = new Date();
+    if (hoy.getDay() === 0) {
+      mostrarAlerta("🚫 No se permiten pagos los domingos");
+      return;
+    }
+    let totalPagado = pagos.reduce((acc, p) => acc + p.monto, 0);
+    if (totalPagado >= deudaTotal) {
+      mostrarAlerta("🎉 La deuda ya fue cancelada");
+      return;
+    }
+
+    let fechaForm = formatearFecha(hoy);
+    if (pagos.some(p => p.fecha.includes(fechaForm))) {
+      mostrarAlerta("⚠️ Ya se registró un pago hoy");
+      return;
+    }
+    pagos.push({fecha: fechaForm, monto: cuotaDiaria});
+    actualizarVista();
+  }
+
+  function registrarPagoManual() {
+    let fecha = document.getElementById("fechaPago").value;
+    let monto = parseFloat(document.getElementById("montoPago").value);
+
+    if (!fecha || isNaN(monto) || monto <= 0) {
+      mostrarAlerta("❌ Ingresa fecha y monto válidos");
+      return;
+    }
+
+    const [y, m, day] = fecha.split('-').map(Number);
+    let fechaObj = new Date(y, m - 1, day);
+    if (fechaObj.getDay() === 0) {
+      mostrarAlerta("🚫 No se permiten pagos los domingos");
+      return;
+    }
+
+    let totalPagado = pagos.reduce((acc, p) => acc + p.monto, 0);
+    if (totalPagado >= deudaTotal) {
+      mostrarAlerta("🎉 La deuda ya fue cancelada");
+      return;
+    }
+
+    let fechaForm = formatearFecha(fecha);
+    if (pagos.some(p => p.fecha.includes(fechaForm))) {
+      mostrarAlerta("⚠️ Ya existe un pago ese día");
+      return;
+    }
+
+    pagos.push({fecha: fechaForm, monto});
+    actualizarVista();
+    document.getElementById("fechaPago").value = "";
+    document.getElementById("montoPago").value = 20;
+  }
+
+  function editarPago(i) {
+    let nuevoMonto = parseFloat(prompt("Nuevo monto:", pagos[i].monto));
+    if (!isNaN(nuevoMonto) && nuevoMonto > 0) {
+      pagos[i].monto = nuevoMonto;
+      actualizarVista();
+    }
+  }
+
+  function eliminarPago(i) {
+    if (confirm("¿Seguro que quieres eliminar este pago?")) {
+      pagos.splice(i,1);
+      actualizarVista();
+    }
+  }
+
+  function abrirModalClave() {
+    if (modoAdmin) {
+      // Cerrar sesión admin
+      modoAdmin = false;
+      document.getElementById("seccionAdmin").style.display = "none";
+      document.getElementById("estadoPagoCard").style.display = "none";
+      document.querySelector("button.btn-light").innerText = "🔑 Cambiar Vista";
+      actualizarVista();
+    } else {
+      new bootstrap.Modal(document.getElementById("claveModal")).show();
+    }
+  }
+
+  function verificarClave() {
+    let claveIngresada = document.getElementById("claveInput").value;
+    if (claveIngresada === adminPassword) {
+      modoAdmin = true;
+      document.getElementById("seccionAdmin").style.display = "block";
+      document.getElementById("estadoPagoCard").style.display = "block";
+      document.querySelector("button.btn-light").innerText = "👁️ Vista Cliente";
+      actualizarVista();
+      bootstrap.Modal.getInstance(document.getElementById("claveModal")).hide();
+      document.getElementById("claveInput").value = "";
+    } else {
+      mostrarAlerta("❌ Clave incorrecta");
+    }
+  }
+
+  actualizarVista();
+</script>
+</body>
+</html>
